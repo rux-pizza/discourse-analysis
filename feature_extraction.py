@@ -2,8 +2,9 @@ from bs4 import BeautifulSoup, NavigableString, Tag
 from nltk.stem import snowball
 import re
 import datetime
-from sklearn import preprocessing
 import numpy as np
+
+from sklearn import preprocessing
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.cross_validation import train_test_split
 
@@ -76,6 +77,7 @@ def extract_features(data, train_size, with_stemmer, tfidf):
 def extract_labels(data):
     return data["users_giving_a_fuck"] != ""
 
+tags_to_keep = {"a", "img", "strong", "blockquote", "i"}
 
 def html_to_text(html):
     if not len(html.contents):
@@ -86,12 +88,14 @@ def html_to_text(html):
         if isinstance(node, NavigableString):
             yield node.string
         elif isinstance(node, Tag):
-            if node.name == "a":
-                yield " htmllink "
-            elif node.name == "img":
-                yield " htmlimg "
-            elif node.name == "br":
+            if node.name == "br":
                 yield "\n"
+            elif node.name in tags_to_keep:
+                yield " htmltag%s " % node.name
+            elif node.name == "span":
+                clazz = node.get("class", "")
+                if len(clazz) == 2 and clazz[0] == "typefaces-tag":
+                    yield " typefacestag%s " % clazz[1]
         node = node.next_element
 
 
@@ -105,6 +109,11 @@ def preprocess_text(raw_text, with_stemmer):
     meaningful_words = words
     if with_stemmer:
         for stemmer in stemmers:
-            meaningful_words = map(stemmer.stem, meaningful_words)
+            def stem(word):
+                if word.startswith("htmltag") or word.startswith("typefacestag"):
+                    return word
+                else:
+                    return stemmer.stem(word)
+            meaningful_words = map(stem, meaningful_words)
 
     return " ".join(meaningful_words)
