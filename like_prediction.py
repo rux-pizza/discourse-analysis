@@ -1,6 +1,7 @@
-__author__ = 'BH4101'
 import data
 import feature_extraction
+
+__author__ = 'David Montoya'
 
 data = data.posts()
 

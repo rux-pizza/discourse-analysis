@@ -2,6 +2,8 @@
 import pandas as pd
 import numpy as np
 
+__author__ = 'David Montoya'
+
 
 def posts():
     print "Reading posts..."

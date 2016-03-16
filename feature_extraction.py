@@ -8,6 +8,8 @@ from sklearn import preprocessing
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.cross_validation import train_test_split
 
+__author__ = 'David Montoya'
+
 stemmers = [snowball.FrenchStemmer(), snowball.EnglishStemmer()]
 
 
@@ -75,7 +77,7 @@ def extract_features(data, train_size, with_stemmer, tfidf):
     return features_vector_train, features_vector_test, label_vector_train, label_vector_test
 
 def extract_labels(data):
-    return data["users_giving_a_fuck"] != ""
+    return data["users_liking"] != ""
 
 tags_to_keep = {"a", "img", "strong", "blockquote", "i"}
 
